@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
 
 namespace WebApi.Controllers
@@ -18,13 +19,23 @@ namespace WebApi.Controllers
         }
         public async Task<IActionResult> GetProducts()
         {
-            return Ok();
+            return Ok(await _context.Products.ToListAsync());
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetProduct(int? id)
+        public async Task<IActionResult> GetProduct(int? id)
         {
-            return Ok();
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product);
+            
         }
     }
 }
